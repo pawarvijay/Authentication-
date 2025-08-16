@@ -1,0 +1,20 @@
+---
+config:
+  layout: dagre
+---
+flowchart TD
+    A["User submits credentials (login/signup)"] --> B["Server Action receives credentials"]
+    B --> C["Validate credentials"]
+    C -- Valid --> D["Generate encrypted session token (e.g., via jose)"]
+    D --> E@{ label: "Set 'session' cookie (HttpOnly, Secure, SameSite, with expiry)" }
+    E --> F["Client stores cookie"] & M["User logs out"]
+    F --> G["Subsequent request → cookie sent automatically"]
+    G --> H["Server reads session cookie"]
+    H --> I["Decrypt & verify session token"]
+    I -- Valid & not expired --> J["authenticated request; optionally refresh cookie expiration"]
+    I -- Invalid/expired --> K["Redirect to login"]
+    J --> L["Continue processing request"] & M
+    M --> N@{ label: "Delete 'session' cookie" }
+    N --> O["Subsequent requests have no session → user unauthenticated"]
+    E@{ shape: rect}
+    N@{ shape: rect}
